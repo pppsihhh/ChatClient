@@ -1,6 +1,12 @@
 package academy.prog;
 
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Main {
@@ -11,6 +17,7 @@ public class Main {
 		try {
 			System.out.println("Enter your login: ");
 			login = scanner.nextLine();
+
 	
 			Thread th = new Thread(new GetThread());
 			th.setDaemon(true);
@@ -21,12 +28,25 @@ public class Main {
 				String text = scanner.nextLine();
 				if (text.isEmpty()) break;
 
-				Message m = new Message(login, text);
-				int res = m.send(Utils.getURL() + "/add");
+				if (text.equals("#users")) {
+					Gson gson = new GsonBuilder().create();
+					URL url = new URL(Utils.getURL() + "/users");
+					HttpURLConnection http = (HttpURLConnection) url.openConnection();
+					InputStream is = http.getInputStream();
+					byte[] buf1 = GetThread.responseBodyToArray(is);
+					String ss1 = new String(buf1,StandardCharsets.UTF_8);
+					OnlineJsp on = gson.fromJson(ss1,OnlineJsp.class);
+					System.out.println(on);
 
-				if (res != 200) { // 200 OK
-					System.out.println("HTTP error ocurred: " + res);
-					return;
+				} else {
+
+					Message m = new Message(login, text);
+					int res = m.send(Utils.getURL() + "/add");
+
+					if (res != 200) { // 200 OK
+						System.out.println("HTTP error ocurred: " + res);
+						return;
+					}
 				}
 			}
 		} catch (IOException ex) {

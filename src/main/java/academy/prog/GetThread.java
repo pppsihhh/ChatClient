@@ -50,7 +50,7 @@ public class GetThread implements Runnable {
         }
     }
 
-    private byte[] responseBodyToArray(InputStream is) throws IOException {
+    public static byte[] responseBodyToArray(InputStream is) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         byte[] buf = new byte[10240];
         int r;
